@@ -31,7 +31,7 @@ const BlankLayout = () => (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       {/* header */}
-      <AppBar position="fixed" sx={{ backgroundColor: "#fff" }}>
+      <AppBar position="fixed" sx={{ backgroundColor: "#fff" }} elevation={2}>
         <Toolbar>
 
         <Typography variant="h6" noWrap component="div">
