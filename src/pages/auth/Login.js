@@ -10,23 +10,18 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
-  Button,
   Grid,
 } from "@mui/material";
 
 import IconButton from "@mui/material/IconButton";
-import FilledInput from "@mui/material/FilledInput";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
 import InputAdornment from "@mui/material/InputAdornment";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Otp from "./Otp";
 
 const defaultTheme = {}; // Replace with your theme configuration
 
@@ -54,17 +49,31 @@ function Copyright(props) {
 }
 
 const LogIn = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
+  // Show / Hide password
+  const [showPassword, setShowPassword] = React.useState({
+    password: false,
+    confirmPassword: false,
+  });
+  const handleClickShowPassword = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const [loading, setLoading] = React.useState(false);
-  function handleClick() {
-    setLoading(!loading);
+
+  // OTP
+  const [email, setEmail] = React.useState("");
+  function handleOtpSumbit(otp, email) {
+    console.log("OTP:", otp);
+    console.log("Email:", email);
   }
+
+  // for disabling Sign In btn
+  const [loginLoading, setLoginLoading] = React.useState(false);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -73,9 +82,13 @@ const LogIn = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      setLoginLoading(!loginLoading);
+      console.log("Login Values:", values);
+      setEmail(values.email);
       // Handle form submission
     },
+    validateOnChange: false,
+    validateOnBlur: false,
   });
 
   return (
@@ -84,7 +97,7 @@ const LogIn = () => {
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            marginTop: 4,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -98,12 +111,11 @@ const LogIn = () => {
           </Typography>
           <Box
             component="form"
-            onSubmit={formik.handleSubmit}
             noValidate
             sx={{ mt: 1 }}
+            onSubmit={formik.handleSubmit}
           >
             <TextField
-              margin="normal"
               required
               fullWidth
               id="email"
@@ -115,86 +127,104 @@ const LogIn = () => {
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
 
-            <FormControl
+            <TextField
               fullWidth
               margin="normal"
               required
               size="small"
               variant="outlined"
-            >
-              <InputLabel htmlFor="outlined-adornment-password">
-                Password
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-password"
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                autoComplete="current-password"
-                type={showPassword ? "text" : "password"}
-                endAdornment={
+              type={showPassword.password ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
+              label="Password"
+              InputProps={{
+                endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
+                      onClick={() => handleClickShowPassword("password")}
                       onMouseDown={handleMouseDownPassword}
                       edge="end"
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showPassword.password ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
                     </IconButton>
                   </InputAdornment>
-                }
-                label="Password"
-              />
-            </FormControl>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="remember"
-                  color="primary"
-                  checked={formik.values.remember}
-                  onChange={formik.handleChange}
-                />
-              }
-              label="Remember me"
+                ),
+              }}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
             />
+            <Grid container sx={{ alignItems: "center" }}>
+              <Grid item xs>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="remember"
+                      color="primary"
+                      checked={formik.values.remember}
+                      onChange={formik.handleChange}
+                    />
+                  }
+                  label="Remember me"
+                  variant="body2"
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="body2" color="textSecondary">
+                  <Link
+                    to="/auth/forgot-password"
+                    variant="body2"
+                    style={{ textDecoration: "none" }}
+                  >
+                    Forgot password?
+                  </Link>
+                </Typography>
+              </Grid>
+            </Grid>
+
             <LoadingButton
-              ype="submit"
+              type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              onClick={handleClick}
+              sx={{ mt: 1, mb: 2 }}
               endIcon={""}
-              loading={loading}
+              loading={loginLoading}
               loadingPosition="end"
               // disabled={true}
             >
               <span>Sign In</span>
             </LoadingButton>
-            <Grid container>
-              <Grid item xs>
-                <Typography variant="body2" color="textSecondary">
-                  <Link to="/auth/forgot-password" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography variant="body2" color="textSecondary">
-                  Don't have an account?
-                  <Link to="/auth/register" variant="body2">
-                    {"Sign Up"}
-                  </Link>
-                </Typography>
-              </Grid>
+            <Grid container sx={{ justifyContent: "center" }}>
+              <Typography variant="body2">
+                Don't have an account?
+                <Link
+                  to="/auth/register"
+                  variant="body2"
+                  style={{ textDecoration: "none" }}
+                >
+                  {"  Sign Up"}
+                </Link>
+              </Typography>
             </Grid>
           </Box>
         </Box>
+
+        {/* OTP verification */}
+        <Otp length={6} email={email} onSubmit={handleOtpSumbit} />
+
         {/* Add the Copyright component here */}
-        <Copyright sx={{ mt: 5 }} />
+        <Copyright sx={{ mt: 2 }} />
       </Container>
     </ThemeProvider>
   );

@@ -5,23 +5,4 @@
     padding: 0;
     box-sizing: border-box;
 }
-body {
-    font-family: "Poppins", sans-serif !important;
-    font-weight: 400 !important;
-    /* font-style: normal; */
-    /* background-color: #EEF7FF !important; */
-}
-
-header{ background-color: #CDE8E5; width: 100%;}
-.menu-btn:hover{
-    background-color: rgb(230 247 255) !important;
-}
-
-
-.sidebar {
-    background-color: #CDE8E5;
-    width: 0;
-    overflow: hidden;
-    transition: width 0.3s ease;
-  }
   

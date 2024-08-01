@@ -8,38 +8,23 @@ import {
   Avatar,
   Typography,
   TextField,
-  FormControlLabel,
-  Checkbox,
-  Button,
   Grid,
 } from "@mui/material";
 
-import IconButton from "@mui/material/IconButton";
-import FilledInput from "@mui/material/FilledInput";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Otp from "./Otp";
 
 const defaultTheme = {}; // Replace with your theme configuration
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Required"),
-  password: Yup.string().required("Required"),
 });
 
 const Forgot = () => {
   const [loading, setLoading] = React.useState(false);
-  function handleClick() {
-    setLoading(!loading);
-  }
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -49,9 +34,20 @@ const Forgot = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       console.log(values);
+      setLoading(!loading);
+      setEmail(values.email);
       // Handle form submission
     },
+    validateOnChange: false,
+    validateOnBlur: false,
   });
+
+  // OTP
+  const [email, setEmail] = React.useState("");
+  function handleOtpSumbit(otp, email) {
+    console.log("OTP:", otp);
+    console.log("Email:", email);
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -59,7 +55,7 @@ const Forgot = () => {
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            marginTop: 4,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -90,14 +86,15 @@ const Forgot = () => {
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
 
             <LoadingButton
-              ype="submit"
+              type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              onClick={handleClick}
               endIcon={""}
               loading={loading}
               loadingPosition="end"
@@ -108,14 +105,21 @@ const Forgot = () => {
             <Grid container justifyContent="center">
               <Grid item>
                 <Typography variant="body2" color="textSecondary">
-                  <Link to="/auth/login" variant="body2">
-                    Sign in
+                  <Link
+                    to="/auth/login"
+                    variant="body2"
+                    style={{ textDecoration: "none" }}
+                  >
+                    Sign In
                   </Link>
                 </Typography>
               </Grid>
             </Grid>
           </Box>
         </Box>
+        {/* OTP verification */}
+        <Otp length={6} email={email} onSubmit={handleOtpSumbit} />
+
         {/* Add the Copyright component here */}
       </Container>
     </ThemeProvider>
